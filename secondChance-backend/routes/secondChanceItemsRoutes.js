@@ -27,10 +27,17 @@ router.get('/', async (req, res, next) => {
     logger.info('/ called');
     try {
         //Step 2: task 1 - insert code here
-        //Step 2: task 2 - insert code here
-        //Step 2: task 3 - insert code here
-        //Step 2: task 4 - insert code here
+        const db = await connectToDatabase(); // Connect to the database
+        
 
+        //Step 2: task 2 - insert code here
+        const collection = db.collection("secondChanceItems"); // Initialize the collection reference
+      
+        //Step 2: task 3 - insert code here
+        const secondChanceItems = await collection.find({}).toArray();
+        //Step 2: task 4 - insert code here
+        res.json(secondChanceItems);
+      
         const collection = db.collection("secondChanceItems");
         const secondChanceItems = await collection.find({}).toArray();
         res.json(secondChanceItems);
