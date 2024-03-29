@@ -68,5 +68,48 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Task 1: Use the `body`, `validationResult` from `express-validator` for input validation
+router.put('/update', [
+    body('email').isEmail().normalizeEmail(),
+    body('userName').notEmpty(),
+    body('password').isLength({ min: 6 }),
+], async (req, res) => {
+    // Task 2: Validate the input using `validationResult` and return an appropriate message if you detect an error
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        // Task 3: Check if `email` is present in the header and throw an appropriate error message if it is not present
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required in the header' });
+        }
+
+        // Task 4: Connect to MongoDB
+        const db = await connectToDatabase();
+        const usersCollection = db.collection('users');
+
+        // Task 5: Find the user credentials in database
+        const existingUser = await usersCollection.findOne({ email });
+        if (!existingUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Task 6: Update the user credentials in the database
+        await usersCollection.updateOne({ email }, { $set: { ...req.body, updatedAt: new Date() } });
+
+        // Task 7: Create JWT authentication with `user._id` as a payload using the secret key from the .env file
+        const token = jwt.sign({ userId: existingUser._id }, process.env.JWT_SECRET);
+
+        res.json({ authtoken: token });
+    } catch (e) {
+        return res.status(500).send('Internal server error');
+    }
+});
+
+module.exports = router;
+
 module.exports = router;
        
