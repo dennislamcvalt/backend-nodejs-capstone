@@ -110,6 +110,4 @@ router.put('/update', [
 });
 
 module.exports = router;
-
-module.exports = router;
        
